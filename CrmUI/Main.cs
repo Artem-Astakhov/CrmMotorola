@@ -14,15 +14,24 @@ namespace CrmUI
     public partial class Main : Form
     {
         CrmContext db;
+        Cart cart;
+        Customer customer;
+        CashDesk cashDesk;
+
         public Main()
         {
             InitializeComponent();
             db = new CrmContext();
+
+            cart = new Cart(customer);
+            cashDesk = new CashDesk(1, db.Sellers.FirstOrDefault(),db);
+            cashDesk.IsModel = false;
         }
 
         private void Main_Load(object sender, EventArgs e)
-        {
-
+        {            
+            listBox1.Items.AddRange(db.Products.ToArray());
+            listBox2.Items.AddRange(cart.GetAll().ToArray());
         }
         private void ProductToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -76,6 +85,56 @@ namespace CrmUI
                 db.Products.Add(formProduct.Product);
                 db.SaveChanges();
             }
+        }
+
+        private void listBox1_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            if(listBox1.SelectedItem is Product product)
+            {
+                cart.Add(product);
+                listBox2.Items.Add(product);
+                label1.Text = "Сумма: " + cart.Price;
+            }
+        }
+
+        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            var form = new Login();
+            form.ShowDialog();
+            if (form.DialogResult == DialogResult.OK)
+            {
+                var tempCustomer = db.Customers.FirstOrDefault(c => c.Name.Equals(form.Customer.Name));
+                if (tempCustomer != null)
+                {
+                    customer = tempCustomer;
+                }
+                else
+                {
+                    db.Customers.Add(form.Customer);
+                    db.SaveChanges();
+                    customer = form.Customer;
+                }
+
+                cart.Customer = customer;
+            }
+
+            linkLabel1.Text = $"{customer.Name}";
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            if (customer != null)
+            {
+                cashDesk.Enqueue(cart);
+                cashDesk.Dequeue();                
+            }
+            else
+            {
+                MessageBox.Show("Login", "", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+            cart = new Cart(customer);
+            listBox2.Items.Clear();
+            label1.Text = "0";
         }
     }
 }
