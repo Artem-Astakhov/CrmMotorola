@@ -17,7 +17,7 @@ namespace CrmUI
     {
         CrmContext db;
         DbSet<T> set;
-        public Product Product { get; set; }
+        //public Product Product { get; set; }
         public Customer Customer { get; set; }
         public Seller Seller { get; set; }
         public Catalog(DbSet<T> set, CrmContext db) 
@@ -116,6 +116,32 @@ namespace CrmUI
             }
         }
 
-        
+        private void button3_Click(object sender, EventArgs e)
+        {
+            var id = dataGridView.SelectedRows[0].Cells[0].Value;
+
+            if (typeof(T) == typeof(Product))
+            {
+                var product = db.Products.Find(id);
+                db.Products.Remove(product);
+                db.SaveChanges();
+                dataGridView.Refresh();
+
+            }
+            else if (typeof(T) == typeof(Customer))
+            {
+                var customer = db.Customers.Find(id);
+                db.Customers.Remove(customer);
+                db.SaveChanges();
+                dataGridView.Refresh();
+            }
+            else if (typeof(T) == typeof(Seller))
+            {
+                var seller = db.Sellers.Find(id);
+                db.Sellers.Remove(seller);
+                db.SaveChanges();
+                dataGridView.Refresh();
+            }
+        }
     }
 }

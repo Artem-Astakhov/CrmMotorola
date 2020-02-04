@@ -19,15 +19,17 @@ namespace CrmUI
         public ProductForm()
         {
             InitializeComponent();
+            Product = new Product();
+
         }
 
         public ProductForm(Product product):this()
         {
-            Product = product;
-            textBox1.Text = product.Name;
-            numericUpDown1.Value = product.Price;
-            numericUpDown2.Value = product.Count;
-            textBox4.Text = product.Color;
+            Product = product ?? new Product();
+            textBox1.Text = Product.Name;
+            numericUpDown1.Value = Product.Price;
+            numericUpDown2.Value = Product.Count;
+            textBox4.Text = Product.Color;
         }
 
         private void CustomerForm_Load(object sender, EventArgs e)
@@ -37,16 +39,15 @@ namespace CrmUI
 
         private void button1_Click(object sender, EventArgs e)
         {
-            var p = Product ?? new Product();
-            
-            p.Name = textBox1.Text;
-            p.Price = numericUpDown1.Value;
-            p.Count = Convert.ToInt32(numericUpDown2.Value);
-            p.Color = textBox4.Text;
-            
-           
+
+            var product = Product ?? new Product();
+
+            product.Name = textBox1.Text;
+            product.Price = numericUpDown1.Value;
+            product.Count = Convert.ToInt32(numericUpDown2.Value);
+            product.Color = textBox4.Text;
+
             Close();
-            
 
         }
     }
